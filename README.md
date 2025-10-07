@@ -8,7 +8,7 @@ Simple CLI command to launch all your live stream chat windows for your currentl
     - [x] Basic app setup
     - [ ] .env file to store credentials, channel id etc
     - [x] Setup the basic main function to run
-    - [ ] Build out the GetYouTubeLiveChatLink
+    - [x] Build out the GetYouTubeLiveChatLink
     - [ ] Build out the GetTwitchLiveChatLink
     - [ ] Build out the GetXLiveChatLink
     - [ ] Launch the browsers windows for each chat URL

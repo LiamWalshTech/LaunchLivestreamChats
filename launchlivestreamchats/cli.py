@@ -4,6 +4,8 @@ from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
 import os
 import json
+import sys
+import webbrowser
 
 # Define the scopes (read-only access to live broadcasts)
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
@@ -77,6 +79,11 @@ def get_youtube_livestream_chat_url():
 
     return f"https://studio.youtube.com/live_chat?is_popout=1&v={youtube_livestream_id}"
 
+def open_browser_with_url(url):
+    print(f"Opening browser with URL: {url}")
+    webbrowser.open(url, new=1)
+
 if __name__ == '__main__':
     youtube_livestream_chat_url = get_youtube_livestream_chat_url()
-    print(youtube_livestream_chat_url)
+    open_browser_with_url(youtube_livestream_chat_url)
+    sys.exit(0)
