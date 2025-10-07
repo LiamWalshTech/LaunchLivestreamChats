@@ -1,37 +1,82 @@
-import os
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google.auth.transport.requests import Request
+import os
+import json
 
-def main():
-    print("Welcome to Launch Livestream Chats")
-    
-    # Define the scopes (adjust based on your needs)
-    scopes = ['https://www.googleapis.com/auth/youtube.readonly']  # Example; use 'https://www.googleapis.com/auth/youtube' for write access
+# Define the scopes (read-only access to live broadcasts)
+SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 
-    # Path to client secrets file
-    client_secrets_file = './youtube-credentials.json'
+# Paths to credentials files
+CLIENT_SECRETS_FILE = './youtube-credentials.json'
+TOKEN_FILE = 'token.json'
 
-    # Initialize the flow without a redirect URI
-    flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
-        client_secrets_file, scopes)
+def get_youtube_credentials():
+    credentials = None
+    print(f"Checking for token file: {TOKEN_FILE}")
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE, 'r') as token:
+            try:
+                data = json.load(token)
+                if isinstance(data, dict) and 'access_token' in data:
+                    credentials = data
+                    print("Token file loaded, validating credentials")
+                else:
+                    print("Token file content invalid, re-authenticating")
+                    os.remove(TOKEN_FILE)
+            except json.JSONDecodeError:
+                print("Token file corrupted, re-authenticating")
+                os.remove(TOKEN_FILE)
 
-    # Get the authorization URL for manual flow
-    auth_url, state = flow.authorization_url(prompt='consent')
+    if not credentials or not credentials.get('refresh_token'):
+        print(f"Credentials invalid or missing, loading from {CLIENT_SECRETS_FILE}")
+        flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
+            CLIENT_SECRETS_FILE, SCOPES)
+        print("Starting OAuth flow")
+        credentials = flow.run_local_server(port=0)
+        with open(TOKEN_FILE, 'w') as token:
+            json.dump(credentials.to_json(), token, indent=2)
+            print("Saved new credentials to token file")
+    return credentials
 
-    print(f"Please open this URL in your browser and authorize the app: {auth_url}")
-    code = input("Enter the authorization code from the browser: ")
-
-    # Exchange the authorization code for credentials
-    flow.fetch_token(code=code)
-    credentials = flow.credentials
-
-    # Build the YouTube API service
+def get_youtube_livestream_id():
+    credentials = get_youtube_credentials()
+    print("Building YouTube API client")
     youtube = build('youtube', 'v3', credentials=credentials)
 
-    # Example API call: List channels
-    request = youtube.channels().list(part="contentDetails", mine=True)
-    response = request.execute()
-    print(response)
+    try:
+        print("Executing API request for current livestream")
+        # Request live broadcasts with mine=True
+        request = youtube.liveBroadcasts().list(
+            part='id,snippet,status',
+            mine=True,
+            maxResults=10  # Adjust if you have many broadcasts
+        )
+        response = request.execute()
+
+        # Find the current livestream
+        current_livestream_id = None
+        if 'items' in response:
+            for item in response['items']:
+                status = item['status']
+                if status.get('lifeCycleStatus') == 'live':
+                    current_livestream_id = item['id']
+                    break
+
+        if current_livestream_id:
+            return current_livestream_id
+        else:
+            print("No active livestream found. Ensure you have a live broadcast running.")
+
+    except HttpError as e:
+        print(f"API error: {e}")
+
+def get_youtube_livestream_chat_url():
+    youtube_livestream_id = get_youtube_livestream_id()
+
+    return f"https://studio.youtube.com/live_chat?is_popout=1&v={youtube_livestream_id}"
 
 if __name__ == '__main__':
-    main()
+    youtube_livestream_chat_url = get_youtube_livestream_chat_url()
+    print(youtube_livestream_chat_url)
