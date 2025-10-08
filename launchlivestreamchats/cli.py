@@ -86,6 +86,9 @@ def get_youtube_livestream_chat_url():
 def get_twitch_livestream_chat_url():
     return f"https://www.twitch.tv/popout/{os.getenv('TWITCH_CHANNEL_NAME')}/chat?popout="
 
+def get_x_livestream_chat_url():
+    return f"https://x.com/{os.getenv('X_USER_HANDLE')}/chat"
+
 def open_browser_with_url(url):
     print(f"Opening browser with URL: {url}")
     webbrowser.open(url, new=1)
@@ -93,8 +96,10 @@ def open_browser_with_url(url):
 if __name__ == '__main__':
     youtube_livestream_chat_url = get_youtube_livestream_chat_url()
     twitch_livestream_chat_url = get_twitch_livestream_chat_url()
+    x_livestream_chat_url = get_x_livestream_chat_url()
 
     open_browser_with_url(youtube_livestream_chat_url)
     open_browser_with_url(twitch_livestream_chat_url)
+    open_browser_with_url(x_livestream_chat_url)
 
     sys.exit(0)
