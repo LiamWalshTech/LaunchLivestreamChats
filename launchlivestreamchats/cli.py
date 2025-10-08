@@ -1,9 +1,10 @@
+from dotenv import load_dotenv
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.transport.requests import Request
-import os
 import json
+import os
 import sys
 import webbrowser
 
@@ -11,8 +12,11 @@ import webbrowser
 SCOPES = ['https://www.googleapis.com/auth/youtube.readonly']
 
 # Paths to credentials files
+ENV_FILE = '.env'
 CLIENT_SECRETS_FILE = './youtube-credentials.json'
 TOKEN_FILE = 'token.json'
+
+load_dotenv(ENV_FILE)
 
 def get_youtube_credentials():
     credentials = None
@@ -79,11 +83,18 @@ def get_youtube_livestream_chat_url():
 
     return f"https://studio.youtube.com/live_chat?is_popout=1&v={youtube_livestream_id}"
 
+def get_twitch_livestream_chat_url():
+    return f"https://www.twitch.tv/popout/{os.getenv('TWITCH_CHANNEL_NAME')}/chat?popout="
+
 def open_browser_with_url(url):
     print(f"Opening browser with URL: {url}")
     webbrowser.open(url, new=1)
 
 if __name__ == '__main__':
     youtube_livestream_chat_url = get_youtube_livestream_chat_url()
+    twitch_livestream_chat_url = get_twitch_livestream_chat_url()
+
     open_browser_with_url(youtube_livestream_chat_url)
+    open_browser_with_url(twitch_livestream_chat_url)
+
     sys.exit(0)

@@ -6,10 +6,10 @@ Simple CLI command to launch all your live stream chat windows for your currentl
 
 - [ ] Phase 1
     - [x] Basic app setup
-    - [ ] .env file to store credentials, channel id etc
+    - [x] .env file to store credentials, channel id etc
     - [x] Setup the basic main function to run
     - [x] Build out the GetYouTubeLiveChatLink
-    - [ ] Build out the GetTwitchLiveChatLink
+    - [x] Build out the GetTwitchLiveChatLink
     - [ ] Build out the GetXLiveChatLink
     - [ ] Launch the browsers windows for each chat URL
     - [ ] Auto close terminal when done
