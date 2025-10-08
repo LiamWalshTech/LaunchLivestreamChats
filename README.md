@@ -15,7 +15,7 @@ Simple CLI command to launch all your live stream chat windows for your currentl
     - ~~[ ] Auto close terminal when done~~
 - [ ] Phase 2
     - [ ] Convert script to cli command
-    - [ ] Load credentials from user input
+    - [x] Load credentials from user input
         - [ ] Screen with options of live stream platforms to choose from
         - [ ] Screen for each platform credentials form
-        - [ ] Persist the users credentials locally for next time
+        - [x] Persist the users credentials locally for next time
